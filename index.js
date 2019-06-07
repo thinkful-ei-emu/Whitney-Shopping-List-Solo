@@ -2,12 +2,13 @@
 
 const STORE = {
   items: [
-    {id: cuid(), name: "apples", checked: false},
-    {id: cuid(), name: "oranges", checked: false},
-    {id: cuid(), name: "milk", checked: true},
-    {id: cuid(), name: "bread", checked: false}
+    {id: cuid(), name: "apples", checked: false, searched: true},
+    {id: cuid(), name: "oranges", checked: false, searched: true},
+    {id: cuid(), name: "milk", checked: true, searched: true},
+    {id: cuid(), name: "bread", checked: false, searched: true}
   ],
-  hideCompleted: false
+  hideCompleted: false,
+  searchCompleted: false
 };
 
 function generateItemElement(item) {
@@ -35,7 +36,7 @@ function generateShoppingItemsString(shoppingList) {
 }
 
 
-function renderShoppingList() {
+function renderShoppingList(searchTerm) {
   // render the shopping list in the DOM
   console.log('`renderShoppingList` ran');
 
@@ -49,6 +50,15 @@ function renderShoppingList() {
     filteredItems = filteredItems.filter(item => !item.checked);
   }
 
+  // Checks to see if user has submitted a search //passing searchTerm
+  if(STORE.searchCompleted) {
+    // if user has submitted a search, searchItems with filteredItems
+    filteredItems = filteredItems.filter(item => {
+      return item.name === searchTerm
+      STORE.searchCompleted = false;
+    });
+     
+  }
   // at this point, all filtering work has been done (or not done, if that's the current settings), so
   // we send our `filteredItems` into our HTML generation function 
   const shoppingListItemsString = generateShoppingItemsString(filteredItems);
@@ -56,7 +66,6 @@ function renderShoppingList() {
   // insert that HTML into the DOM
   $('.js-shopping-list').html(shoppingListItemsString);
 }
-
 
 function addItemToShoppingList(itemName) {
   console.log(`Adding "${itemName}" to shopping list`);
@@ -68,7 +77,7 @@ function handleNewItemSubmit() {
     event.preventDefault();
     console.log('`handleNewItemSubmit` ran');
     const newItemName = $('.js-shopping-list-entry').val();
-    $('.js-shopping-list-entry').val('');
+    $('.js-shopping-list-entry').val(''); // WHY IS THIS HERE TWICE?
     addItemToShoppingList(newItemName);
     renderShoppingList();
   });
@@ -137,6 +146,29 @@ function handleToggleHideFilter() {
   });
 }
 
+// USER CAN TYPE IN A SEARCH TERM AND THE DISPLAYED LIST WILL BE FILTERED BY ITEM NAMES ONLY CONTAINING THAT SEARCH TERM
+
+// Listen for a user to submit a search
+function handleSearchItemSubmit() {
+  $('#js-search-controls').submit(function(event) {
+    event.preventDefault(); 
+    //console.log('`handleSearchItemSubmit` ran');
+    // get the user's search term from the DOM
+    const searchTerm = $('.js-search-bar-entry').val();
+    // let the STORE now a search was compelted
+    
+    STORE.searchCompleted = true;
+    //console.log(searchItem);
+    renderShoppingList(searchTerm);
+  });
+}
+
+
+
+// USER CAN EDIT THE TITLE OF AN ITEM
+
+
+
 // this function will be our callback when the page loads. it's responsible for
 // initially rendering the shopping list, and activating our individual functions
 // that handle new item submission and user clicks on the "check" and "delete" buttons
@@ -147,6 +179,7 @@ function handleShoppingList() {
   handleItemCheckClicked();
   handleDeleteItemClicked();
   handleToggleHideFilter();
+  handleSearchItemSubmit();
 }
 
 // when the page loads, call `handleShoppingList`
