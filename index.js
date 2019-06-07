@@ -22,6 +22,10 @@ function generateItemElement(item) {
         <button class="shopping-item-delete js-item-delete">
             <span class="button-label">delete</span>
         </button>
+        <!-- Creates edit buttons for each 'li'-->
+        <button class="shopping-item-edit js-item-edit">
+          <span class="button-label">edit</span>
+        </button>
       </div>
     </li>`;
 }
@@ -166,6 +170,36 @@ function handleSearchItemSubmit() {
 
 
 // USER CAN EDIT THE TITLE OF AN ITEM
+// using prompt() creates a dialog input box, which returns user input if user chooses "OK" or returns null; Syntax = prompt(text, defaultText)
+
+// Listen for user click on edit buttons
+function handleEditItemClicked() {
+  $('.js-shopping-list').on('click', '.js-item-edit', event => {
+    //console.log('`handleEditItemClicked` ran');
+    // get the itemIndex from the item clicked
+    const itemIndex = getItemIdFromElement(event.currentTarget);
+    editItemClicked(itemIndex);
+    // render the updated shopping list
+    renderShoppingList();
+  });
+}
+
+// Create prompt dialog box on click
+function editItemClicked(itemId) {
+  const editTerm = prompt('What is your new item name?');
+  // Take user input from dialog box and update item with user input
+  if(editTerm !== null) {
+    const itemIndex2 = STORE.items.findIndex(item => item.id === itemId);
+    //console.log(itemId);
+  
+    STORE.items[itemIndex2].name = editTerm;
+    //console.log(STORE.items[itemIndex2]);
+  }
+  
+}
+
+
+
 
 
 
@@ -180,6 +214,7 @@ function handleShoppingList() {
   handleDeleteItemClicked();
   handleToggleHideFilter();
   handleSearchItemSubmit();
+  handleEditItemClicked();
 }
 
 // when the page loads, call `handleShoppingList`
